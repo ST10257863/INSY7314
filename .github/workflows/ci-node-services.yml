@@ -29,7 +29,6 @@ jobs:
           --health-retries 5
 
     env:
-      # The server will connect to the postgres service via localhost in the runner
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/secure_payments
       NODE_ENV: test
       CORS_ORIGIN: http://localhost:5173
@@ -53,17 +52,15 @@ jobs:
 
       - name: Prepare server .env (CI overrides)
         working-directory: server
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         run: |
-          # Create .env from example
           cp .env.example .env || true
-          # Override DATABASE_URL to point at the postgres service in the runner
-          echo "DATABASE_URL=${{ env.DATABASE_URL }}" >> .env
-          if [ -n "${{ secrets.JWT_SECRET }}" ]; then
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          fi
-          if [ -n "${{ secrets.SESSION_SECRET }}" ]; then
-            echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
-          fi
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          [ -n "$JWT_SECRET" ] && echo "JWT_SECRET=$JWT_SECRET" >> .env
+          [ -n "$SESSION_SECRET" ] && echo "SESSION_SECRET=$SESSION_SECRET" >> .env
 
       - name: Run DB migrations (optional)
         working-directory: server
@@ -73,9 +70,7 @@ jobs:
       - name: Start server in background
         working-directory: server
         run: |
-          # Start the server in background.
           npm run start &
-          # Give background process a moment
           sleep 1
 
       - name: Wait for server to be ready
@@ -84,7 +79,6 @@ jobs:
       - name: Client build
         working-directory: client
         env:
-          # Point the client build at the local API instance
           VITE_API_URL: http://localhost:8443
         run: npm run build
 
