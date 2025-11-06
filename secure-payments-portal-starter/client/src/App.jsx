@@ -19,7 +19,7 @@ export default function App(){
         <div className="header-inner">
           <a className="brand" href="/payments">
             <div className="logo" aria-hidden />
-            <h1>Mat • Secure Payments</h1>
+            <h1>• Secure Payments</h1>
           </a>
           <nav className="nav" role="navigation">
             {user && <span className="subtle" style={{marginRight:8}}>Signed in as <b>{user.email}</b></span>}
