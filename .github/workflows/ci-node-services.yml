@@ -1,0 +1,104 @@
+name: CI - Node + Postgres service
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: secure_payments
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d secure_payments"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/secure_payments
+      NODE_ENV: test
+      CORS_ORIGIN: http://localhost:5173
+      PORT: 8443   # Force server to use a consistent port
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # --- Caching (faster builds) ---
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # --- SERVER SETUP ---
+      - name: Install server dependencies
+        working-directory: secure-payments-portal-starter/server
+        run: npm ci
+
+      - name: Prepare server .env (CI overrides)
+        working-directory: secure-payments-portal-starter/server
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        run: |
+          cp .env.example .env || true
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          [ -n "$JWT_SECRET" ] && echo "JWT_SECRET=$JWT_SECRET" >> .env
+          [ -n "$SESSION_SECRET" ] && echo "SESSION_SECRET=$SESSION_SECRET" >> .env
+          echo "PORT=${{ env.PORT }}" >> .env
+
+      - name: Run DB migrations (optional)
+        working-directory: secure-payments-portal-starter/server
+        run: |
+          npm run migrate || echo "no migrate script or migrations not required"
+
+      - name: Start server in background
+        working-directory: secure-payments-portal-starter/server
+        env:
+          PORT: ${{ env.PORT }}
+        run: |
+          npm run start &
+          sleep 3
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:${{ env.PORT }}/api/health || (sleep 3 && npx wait-on http://localhost:${{ env.PORT }}/api/health)
+
+      # --- CLIENT SETUP ---
+      - name: Install client dependencies
+        working-directory: secure-payments-portal-starter/client
+        run: npm ci
+
+      - name: Client build
+        working-directory: secure-payments-portal-starter/client
+        env:
+          VITE_API_URL: http://localhost:${{ env.PORT }}
+        run: npm run build
+
+      # --- TEST + CLEANUP ---
+      - name: Basic API smoke test
+        run: |
+          curl -f http://localhost:${{ env.PORT }}/api/health || (echo "server did not respond on /api/health" && exit 1)
+
+      - name: Tear down (no-op; runner will clean up)
+        if: always()
+        run: echo "job complete"
