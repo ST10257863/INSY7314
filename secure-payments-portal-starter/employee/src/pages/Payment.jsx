@@ -6,6 +6,8 @@ export default function Payment() {
   const [msg, setMsg] = useState({ type: '', text: '' })
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [rejectingId, setRejectingId] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
 
   async function refresh() {
     const res = await api('/api/payments/pending')
@@ -27,7 +29,32 @@ export default function Payment() {
   }
 
   const rejectPayment = async (id) => {
-    setMsg({ type: 'err', text: `Reject not implemented in backend` })
+    setRejectingId(id)
+    setRejectReason('')
+    setMsg({ type: '', text: '' })
+  }
+
+  const confirmReject = async (id) => {
+    setLoading(true)
+    await getCsrf()
+    const res = await api(`/api/payments/${id}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: rejectReason })
+    })
+    setLoading(false)
+    setRejectingId(null)
+    setRejectReason('')
+    if (res.ok) {
+      setMsg({ type: 'ok', text: `Payment #${id} rejected` })
+      refresh()
+    } else {
+      setMsg({ type: 'err', text: (res.errors?.join(', ') || res.error || 'Failed') })
+    }
+  }
+
+  const cancelReject = () => {
+    setRejectingId(null)
+    setRejectReason('')
   }
 
   const submitToSwift = async () => {
@@ -47,7 +74,7 @@ export default function Payment() {
     <div style={{ display: 'grid', gap: 20, width: '100%', maxWidth: 980 }}>
       <div className="card">
         <h2>International Payments Queue</h2>
-        <p className="subtle">Review, verify, and submit payments to SWIFT.</p>
+        <p className="subtle">Review, verify, reject, and submit payments to SWIFT.</p>
         {msg.text && <div className={`alert ${msg.type === 'ok' ? 'ok' : 'err'}`}>{msg.text}</div>}
         {list.length === 0 ? (
           <p className="subtle">No payments pending.</p>
@@ -77,11 +104,25 @@ export default function Payment() {
                       }
                     </td>
                     <td>
-                      {!p.verified && !p.submitted && (
+                      {!p.verified && !p.submitted && !p.rejected && (
                         <>
                           <button onClick={() => verifyPayment(p.id)} disabled={loading}>Verify</button>
                           <button onClick={() => rejectPayment(p.id)} disabled={loading} style={{ marginLeft: 8 }}>Reject</button>
                         </>
+                      )}
+                      {rejectingId === p.id && (
+                        <div style={{ marginTop: 8 }}>
+                          <input
+                            type="text"
+                            placeholder="Reason for rejection"
+                            value={rejectReason}
+                            onChange={e => setRejectReason(e.target.value)}
+                            style={{ width: 180, marginRight: 8 }}
+                            disabled={loading}
+                          />
+                          <button onClick={() => confirmReject(p.id)} disabled={loading || !rejectReason.trim()}>Confirm</button>
+                          <button onClick={cancelReject} disabled={loading} style={{ marginLeft: 4 }}>Cancel</button>
+                        </div>
                       )}
                       {p.verified && !p.submitted && <span>Ready for SWIFT</span>}
                       {p.submitted && <span>—</span>}
