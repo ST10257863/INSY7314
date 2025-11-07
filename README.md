@@ -8,8 +8,40 @@ React front‑end + Node/Express API with PostgreSQL. Implements:
   rate‑limiting + slowdown (brute force & DDoS), XSS clean, HPP, parameterized SQL queries.
 
 ## Quick start
+
+### Option 1: Run with Docker Compose
+
+You can launch the entire stack (database, server, client, and employee portal) using Docker Compose.
+
+1. **Ensure Docker is installed and running.**
+2. **From the `secure-payments-portal-starter` directory, run:**
+```
+docker-compose up --build
+```
+This will build and start the following services:
+- **db** (PostgreSQL, port 5432)
+- **server** (API, port 8443)
+- **client** (React app, port 5173)
+- **employee** (Employee portal, port 5174)
+
+3. **Access the applications:**
+- Client: [http://localhost:5173](http://localhost:5173)
+- Employee portal: [http://localhost:5174](http://localhost:5174)
+- API: [http://localhost:8443](http://localhost:8443)
+
+4. **To stop and remove containers:**
 1) **Database**: create Postgres db `secure_payments` and set `DATABASE_URL` in `server/.env`.
 2) **Server**
+```
+docker-compose down -v --rmi all
+```
+---
+
+### Option 2: Manual (Local) Run
+
+1. **Database:** Create Postgres db `secure_payments` and set `DATABASE_URL` in `server/.env`.
+2. **Server**
+
 ```
 cd server
 cp .env.example .env

@@ -52,7 +52,7 @@ jobs:
       # --- SERVER SETUP ---
       - name: Install server dependencies
         working-directory: secure-payments-portal-starter/server
-        run: npm ci
+        run: npm install
 
       - name: Prepare server .env (CI overrides)
         working-directory: secure-payments-portal-starter/server
@@ -86,10 +86,21 @@ jobs:
       # --- CLIENT SETUP ---
       - name: Install client dependencies
         working-directory: secure-payments-portal-starter/client
-        run: npm ci
+        run: npm install
 
       - name: Client build
         working-directory: secure-payments-portal-starter/client
+        env:
+          VITE_API_URL: http://localhost:${{ env.PORT }}
+        run: npm run build
+
+      # --- EMPLOYEE SETUP ---
+      - name: Install employee dependencies
+        working-directory: secure-payments-portal-starter/employee
+        run: npm install
+
+      - name: Employee build
+        working-directory: secure-payments-portal-starter/employee
         env:
           VITE_API_URL: http://localhost:${{ env.PORT }}
         run: npm run build
