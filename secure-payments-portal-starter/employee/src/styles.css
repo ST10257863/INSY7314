@@ -1,0 +1,151 @@
+:root{
+  --brand:#0A2645;           /* Desert Night */
+  --brand-2:#15385E;
+  --accent:#1E8CFF;
+  --bg:#0b1420;
+  --card:#0f1b2a;
+  --text:#e8eef7;
+  --muted:#9fb3c8;
+  --ok:#16a34a;
+  --warn:#ef4444;
+  --ring: 0 0 0 3px rgba(30,140,255,.25);
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 10% -10%, #123, transparent 70%),
+    radial-gradient(1200px 800px at 110% 10%, #0a1b31, transparent 60%),
+    linear-gradient(180deg, #081120, #0a1627 40%, #07111e);
+}
+
+/* Layout */
+.shell{
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+.header{
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(180deg, rgba(10,38,69,.6), rgba(10,38,69,0));
+  backdrop-filter: blur(6px);
+}
+.header-inner{
+  max-width:980px;
+  margin:0 auto;
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.brand{
+  display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text);
+}
+.logo{
+  width:34px; height:34px; border-radius:10px;
+  background: radial-gradient(90% 100% at 20% 20%, #1e8cff, #0a2645);
+  box-shadow: 0 6px 20px rgba(30,140,255,.35), inset 0 0 12px rgba(255,255,255,.1);
+}
+.brand h1{margin:0; font-size:18px; letter-spacing:.3px}
+.nav a, .nav button{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:14px;
+  background:none; border:none; cursor:pointer; padding:6px 10px; border-radius:8px;
+}
+.nav a.active{color:var(--text)}
+.nav a:hover, .nav button:hover{color:var(--text); background:rgba(255,255,255,.06)}
+
+.main{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:36px 16px;
+}
+.card{
+  width:100%;
+  max-width:520px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  padding:28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+/* Card for payment section */
+.card-wide {
+    display: inline-block;
+    width: auto;
+    min-width: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+/* Forms */
+h2{margin:0 0 14px 0; font-weight:600}
+.subtle{color:var(--muted); font-size:13px}
+.field{margin:14px 0}
+label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+input, select{
+  width:100%;
+  padding:12px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.15);
+  background:#0b1a2a;
+  color:var(--text);
+  outline:none;
+}
+input:focus, select:focus{box-shadow:var(--ring); border-color:#2a6dff}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+
+.btn{
+  width:100%;
+  margin-top:10px;
+  padding:12px 14px;
+  border:none; border-radius:12px;
+  background:linear-gradient(180deg, #2a7bff, #1e5ee6);
+  color:white; font-weight:600; cursor:pointer;
+  box-shadow: 0 10px 30px rgba(30,140,255,.35);
+}
+.btn[disabled]{opacity:.6; cursor:not-allowed}
+.link{color:#8db9ff; text-decoration:none}
+.link:hover{text-decoration:underline}
+
+.alert{margin-top:10px; font-size:13px}
+.alert.ok{color:var(--ok)}
+.alert.err{color:var(--warn)}
+
+.table {
+  margin-top: 16px;
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 800px;
+  font-size: 14px;
+}
+.table th, .table td{
+  border-bottom:1px solid rgba(255,255,255,.07);
+  padding:10px 8px;
+}
+.table th{color:var(--muted); font-weight:600; text-align:left}
+.footer{
+  color:var(--muted);
+  text-align:center;
+  font-size:12px;
+  padding:14px 0 24px;
+}
+.badges{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
+.badge{
+  font-size:11px; color:var(--muted);
+  border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:6px 10px;
+  background:rgba(255,255,255,.03)
+}
+.center{text-align:center}
