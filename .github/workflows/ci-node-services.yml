@@ -80,8 +80,19 @@ jobs:
           npm run start &
           sleep 3
 
+      - name: Build and start all services
+        working-directory: secure-payments-portal-starter
+        run: docker-compose up -d --build
+
       - name: Wait for server to be ready
-        run: npx wait-on http://localhost:${{ env.PORT }}/api/health || (sleep 3 && npx wait-on http://localhost:${{ env.PORT }}/api/health)
+        run: |
+          for i in {1..10}; do
+            if curl -f http://localhost:8443/api/health; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Server did not become ready" && exit 1
 
       # --- CLIENT SETUP ---
       - name: Install client dependencies
@@ -97,7 +108,12 @@ jobs:
       # --- EMPLOYEE SETUP ---
       - name: Install employee dependencies
         working-directory: secure-payments-portal-starter/employee
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Employee build
         working-directory: secure-payments-portal-starter/employee
