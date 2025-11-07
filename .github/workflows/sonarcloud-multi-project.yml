@@ -17,6 +17,9 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           projectBaseDir: secure-payments-portal-starter/client
+          args: >
+            -Dsonar.projectKey=st10257863_INSY7314
+            -Dsonar.organization=st10257863
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -29,6 +32,9 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           projectBaseDir: secure-payments-portal-starter/employee
+          args: >
+            -Dsonar.projectKey=st10257863_INSY7314_1
+            -Dsonar.organization=st10257863
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -41,5 +47,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           projectBaseDir: secure-payments-portal-starter/server
+          args: >
+            -Dsonar.projectKey=st10257863_INSY7314_2
+            -Dsonar.organization=st10257863
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
