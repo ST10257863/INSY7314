@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { api, getCsrf } from '../api'
 
+function getPaymentStatus(p) {
+  if (p.submitted) {
+    return <span className="ok">Submitted</span>
+  }
+  if (p.verified) {
+    return <span className="ok">Verified</span>
+  }
+  return <span className="err">Pending</span>
+}
+
 export default function Payment() {
   const [list, setList] = useState([])
   const [msg, setMsg] = useState({ type: '', text: '' })
@@ -96,12 +106,7 @@ export default function Payment() {
                     <td>{p.currency} {Number(p.amount).toFixed(2)}</td>
                     <td className="subtle">{new Date(p.created_at).toLocaleString()}</td>
                     <td>
-                      {p.submitted
-                        ? <span className="ok">Submitted</span>
-                        : p.verified
-                          ? <span className="ok">Verified</span>
-                          : <span className="err">Pending</span>
-                      }
+                      {getPaymentStatus(p)}
                     </td>
                     <td>
                       {!p.verified && !p.submitted && !p.rejected && (
