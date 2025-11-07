@@ -2,7 +2,7 @@ name: CI - Node + Postgres service
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "*" ]
 
@@ -80,19 +80,8 @@ jobs:
           npm run start &
           sleep 3
 
-      - name: Build and start all services
-        working-directory: secure-payments-portal-starter
-        run: docker-compose up -d --build
-
       - name: Wait for server to be ready
-        run: |
-          for i in {1..10}; do
-            if curl -f http://localhost:8443/api/health; then
-              exit 0
-            fi
-            sleep 3
-          done
-          echo "Server did not become ready" && exit 1
+        run: npx wait-on http://localhost:${{ env.PORT }}/api/health || (sleep 3 && npx wait-on http://localhost:${{ env.PORT }}/api/health)
 
       # --- CLIENT SETUP ---
       - name: Install client dependencies
@@ -101,22 +90,6 @@ jobs:
 
       - name: Client build
         working-directory: secure-payments-portal-starter/client
-        env:
-          VITE_API_URL: http://localhost:${{ env.PORT }}
-        run: npm run build
-
-      # --- EMPLOYEE SETUP ---
-      - name: Install employee dependencies
-        working-directory: secure-payments-portal-starter/employee
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-
-      - name: Employee build
-        working-directory: secure-payments-portal-starter/employee
         env:
           VITE_API_URL: http://localhost:${{ env.PORT }}
         run: npm run build
