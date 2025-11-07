@@ -1,18 +1,18 @@
 import jwt from 'jsonwebtoken';
 
-export function issueJwt(res, payload){
+export function issueJwt(res, payload, cookieName = 'session') {
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' });
-  // httpOnly, Secure, SameSite=strict to mitigate XSS/CSRF
-  res.cookie('session', token, {
+  res.cookie(cookieName, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     sameSite: 'strict',
-    maxAge: 2*60*60*1000
+    maxAge: 2 * 60 * 60 * 1000
   });
 }
 
 export function requireAuth(req, res, next){
-  const token = req.cookies?.session;
+  // Try both cookies
+  const token = req.cookies?.client_session || req.cookies?.employee_session;
   if (!token) return res.status(401).json({ ok:false, error:'unauthorized' });
   try{
     req.user = jwt.verify(token, process.env.JWT_SECRET);
@@ -22,8 +22,8 @@ export function requireAuth(req, res, next){
   }
 }
 
-export function clearSession(res){
-  res.clearCookie('session', { httpOnly:true, secure: process.env.NODE_ENV !== 'development', sameSite:'strict' });
+export function clearSession(res, cookieName = 'session') {
+  res.clearCookie(cookieName, { httpOnly:true, secure: process.env.NODE_ENV !== 'development', sameSite:'strict' });
 }
 
 export function requireRole(role) {

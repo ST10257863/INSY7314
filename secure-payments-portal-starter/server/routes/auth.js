@@ -16,7 +16,8 @@ router.post('/register', validate(registerSchema), async (req,res) => {
       'insert into users(email, password_hash) values($1,$2) returning id, email, created_at',
       [email, hash]
     );
-    issueJwt(res, { id: rows[0].id, email: rows[0].email, role: 'user' });
+    // For client login
+    issueJwt(res, { id: rows[0].id, email: rows[0].email, role: 'user' }, 'client_session');
     return res.json({ ok:true, user: { id: rows[0].id, email: rows[0].email, role: 'user' } });
   }catch(e){
     if (e.code === '23505'){ // unique_violation
@@ -27,17 +28,19 @@ router.post('/register', validate(registerSchema), async (req,res) => {
   }
 });
 
+// For client login
 router.post('/login', validate(loginSchema), async (req,res) => {
   const { email, password } = req.body;
   const { rows } = await pool.query('select id, email, password_hash from users where email=$1',[email]);
   if (!rows.length) return res.status(401).json({ ok:false, error:'invalid credentials' });
   const ok = await bcrypt.compare(password, rows[0].password_hash);
   if (!ok) return res.status(401).json({ ok:false, error:'invalid credentials' });
-  issueJwt(res, { id: rows[0].id, email: rows[0].email, role: 'user' });
+  // For client login
+  issueJwt(res, { id: rows[0].id, email: rows[0].email, role: 'user' }, 'client_session');
   return res.json({ ok:true, user: { id: rows[0].id, email: rows[0].email, role: 'user' } });
 });
 
-// Employee login route
+// For employee login
 router.post('/employee-login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -51,8 +54,8 @@ router.post('/employee-login', async (req, res) => {
     if (!rows.length) return res.status(401).json({ ok: false, error: 'invalid credentials' });
     const ok = await bcrypt.compare(password, rows[0].password_hash);
     if (!ok) return res.status(401).json({ ok: false, error: 'invalid credentials' });
-    // Issue JWT with role: 'employee'
-    issueJwt(res, { id: rows[0].id, username: rows[0].username, role: 'employee' });
+    // For employee login
+    issueJwt(res, { id: rows[0].id, username: rows[0].username, role: 'employee' }, 'employee_session');
     return res.json({
       ok: true,
       user: {
@@ -68,8 +71,10 @@ router.post('/employee-login', async (req, res) => {
   }
 });
 
+// For logout, clear both cookies
 router.post('/logout', (req,res)=>{
-  clearSession(res);
+  clearSession(res, 'client_session');
+  clearSession(res, 'employee_session');
   res.json({ ok:true });
 });
 

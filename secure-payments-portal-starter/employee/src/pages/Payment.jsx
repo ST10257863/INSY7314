@@ -72,7 +72,7 @@ export default function Payment() {
 
   return (
     <div style={{ display: 'grid', gap: 20, width: '100%', maxWidth: 980 }}>
-      <div className="card">
+      <div className="card-wide">
         <h2>International Payments Queue</h2>
         <p className="subtle">Review, verify, reject, and submit payments to SWIFT.</p>
         {msg.text && <div className={`alert ${msg.type === 'ok' ? 'ok' : 'err'}`}>{msg.text}</div>}
@@ -106,8 +106,8 @@ export default function Payment() {
                     <td>
                       {!p.verified && !p.submitted && !p.rejected && (
                         <>
-                          <button onClick={() => verifyPayment(p.id)} disabled={loading}>Verify</button>
-                          <button onClick={() => rejectPayment(p.id)} disabled={loading} style={{ marginLeft: 8 }}>Reject</button>
+                          <button className="btn" onClick={() => verifyPayment(p.id)} disabled={loading}>Verify</button>
+                          <button className="btn" onClick={() => rejectPayment(p.id)} disabled={loading} style={{ marginLeft: 8 }}>Reject</button>
                         </>
                       )}
                       {rejectingId === p.id && (
@@ -120,8 +120,8 @@ export default function Payment() {
                             style={{ width: 180, marginRight: 8 }}
                             disabled={loading}
                           />
-                          <button onClick={() => confirmReject(p.id)} disabled={loading || !rejectReason.trim()}>Confirm</button>
-                          <button onClick={cancelReject} disabled={loading} style={{ marginLeft: 4 }}>Cancel</button>
+                          <button className="btn" onClick={() => confirmReject(p.id)} disabled={loading || !rejectReason.trim()}>Confirm</button>
+                          <button className="btn" onClick={cancelReject} disabled={loading} style={{ marginLeft: 4 }}>Cancel</button>
                         </div>
                       )}
                       {p.verified && !p.submitted && <span>Ready for SWIFT</span>}

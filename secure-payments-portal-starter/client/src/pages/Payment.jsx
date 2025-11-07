@@ -85,7 +85,7 @@ export default function Payment(){
         </form>
       </div>
 
-      <div className="card">
+      <div className="card-wide">
         <h2>Your recent payments</h2>
         {list.length === 0 ? (
           <p className="subtle">No payments yet.</p>

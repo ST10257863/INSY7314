@@ -22,7 +22,10 @@ router.post('/', requireAuth, validate(paymentSchema), async (req, res) => {
 });
 
 router.get('/', requireAuth, async (req, res) => {
-    const { rows } = await pool.query('select * from payments where user_id=$1 order by created_at desc', [req.user.id]);
+    const { rows } = await pool.query(
+        'select * from payments where user_id=$1 order by created_at desc',
+        [req.user.id]
+    );
     res.json({ ok: true, items: rows });
 });
 
