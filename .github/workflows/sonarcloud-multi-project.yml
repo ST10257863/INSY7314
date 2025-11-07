@@ -14,11 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: SonarCloud Scan (Client)
-        run: |
-          cd secure-payments-portal-starter/client
-          sonar-scanner -Dsonar.projectKey=st10257863_INSY7314 -Dsonar.sources=src
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: secure-payments-portal-starter/client
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   analyze-employee:
     name: Analyze Employee
@@ -26,11 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: SonarCloud Scan (Employee)
-        run: |
-          cd secure-payments-portal-starter/employee
-          sonar-scanner -Dsonar.projectKey=st10257863_INSY7314_1 -Dsonar.sources=src
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: secure-payments-portal-starter/employee
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   analyze-server:
     name: Analyze Server
@@ -38,8 +38,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: SonarCloud Scan (Server)
-        run: |
-          cd secure-payments-portal-starter/server
-          sonar-scanner -Dsonar.projectKey=st10257863_INSY7314_2 -Dsonar.sources=.
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: secure-payments-portal-starter/server
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
