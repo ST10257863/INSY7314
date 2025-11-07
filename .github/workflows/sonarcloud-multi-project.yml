@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: SonarCloud Scan (Client)
         run: |
-          cd client
+          cd secure-payments-portal-starter/client
           sonar-scanner -Dsonar.projectKey=st10257863_INSY7314 -Dsonar.sources=src
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: SonarCloud Scan (Employee)
         run: |
-          cd employee
+          cd secure-payments-portal-starter/employee
           sonar-scanner -Dsonar.projectKey=st10257863_INSY7314_1 -Dsonar.sources=src
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: SonarCloud Scan (Server)
         run: |
-          cd server
+          cd secure-payments-portal-starter/server
           sonar-scanner -Dsonar.projectKey=st10257863_INSY7314_2 -Dsonar.sources=.
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
