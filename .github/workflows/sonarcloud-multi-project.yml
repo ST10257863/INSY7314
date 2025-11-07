@@ -1,0 +1,45 @@
+# .github/workflows/sonarcloud-multi-project.yml
+name: SonarCloud Multi-Project Analysis
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  analyze-client:
+    name: Analyze Client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: SonarCloud Scan (Client)
+        run: |
+          cd client
+          sonar-scanner -Dsonar.projectKey=st10257863_INSY7314 -Dsonar.sources=src
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  analyze-employee:
+    name: Analyze Employee
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: SonarCloud Scan (Employee)
+        run: |
+          cd employee
+          sonar-scanner -Dsonar.projectKey=st10257863_INSY7314_1 -Dsonar.sources=src
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  analyze-server:
+    name: Analyze Server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: SonarCloud Scan (Server)
+        run: |
+          cd server
+          sonar-scanner -Dsonar.projectKey=st10257863_INSY7314_2 -Dsonar.sources=.
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
