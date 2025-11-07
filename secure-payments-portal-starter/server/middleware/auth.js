@@ -25,3 +25,12 @@ export function requireAuth(req, res, next){
 export function clearSession(res){
   res.clearCookie('session', { httpOnly:true, secure: process.env.NODE_ENV !== 'development', sameSite:'strict' });
 }
+
+export function requireRole(role) {
+  return function(req, res, next) {
+    if (!req.user || req.user.role !== role) {
+      return res.status(403).json({ ok: false, error: 'forbidden' });
+    }
+    next();
+  };
+}
